@@ -3,12 +3,13 @@ import random
 
 COLORS = ['black','green','red','yellow','purple','cyan','pink','blue']
 STARTING_MOVE_DISTANCE = 5
-MOVE_DISTANCE = 10
+MOVE_INCREMENT = 10
 
 
 class CarManager:
     def __init__(self):
         self.all_cars = []
+        self.car_speed = STARTING_MOVE_DISTANCE
     
     def create_cars(self):
         chance = random.randint(1,6)
@@ -23,4 +24,7 @@ class CarManager:
     
     def move_cars(self):
         for car in self.all_cars:
-            car.backward(STARTING_MOVE_DISTANCE)
+            car.backward(self.car_speed)
+        
+    def level_up(self):
+        self.car_speed+=MOVE_INCREMENT
