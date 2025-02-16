@@ -1,6 +1,8 @@
 from tkinter import *
 import random
 import string
+from tkinter import messagebox
+import json
 # ---------------------------- PASSWORD GENERATOR ------------------------------- #
 def generate_password():
     li=[]
@@ -10,7 +12,7 @@ def generate_password():
     li.append(random.choice(upper))
     li.append(random.choice(lower))
     li.append(random.choice(special_chars))
-    length = random.choice([5,8])
+    length = random.choice([5,10])
     for _ in range(length):
         source = random.choice([upper,lower,special_chars])
         li.append(source[random.randrange(0,len(source))])
@@ -18,21 +20,37 @@ def generate_password():
     password = "".join(li)
     password_entry.insert(0,password)
 
-
-
 # ---------------------------- SAVE PASSWORD ------------------------------- #
 def delete_all_entries():
     website_entry.delete(0,END)
     password_entry.delete(0,END)
 def password_saving():
-    with open(r"c:\Users\Manoj\Downloads\passwords.txt",'a') as passwords_file:
         website = website_entry.get()
         email = email_entry.get()
         password = password_entry.get()
-        passwords_file.write(website+"|"+email+"|"+password+'\n')
-        delete_all_entries()
 
-
+        new_data = {
+             website:{
+                  "email":email,
+                  "password":password
+             }
+        }
+        if len(website) == 0 or len(password)==0:
+            messagebox.showinfo(title="Oops", message="Please make sure to enter the credentials")
+        else:
+            try:
+                with open(r"c:\Users\Manoj\Downloads\passwords.json",'r') as passwords_file:
+                    data=json.load(passwords_file)
+            except FileNotFoundError:
+                with open(r"c:\Users\Manoj\Downloads\passwords.json",'w') as passwords_file:
+                    json.dump(new_data,passwords_file,indent=4)
+            else:    
+                data.update(new_data)
+                with open(r"c:\Users\Manoj\Downloads\passwords.json",'w') as passwords_file:
+                    json.dump(data,passwords_file,indent=4)
+            finally:    
+                delete_all_entries()
+        
 
 # ---------------------------- UI SETUP ------------------------------- #
 window = Tk()
