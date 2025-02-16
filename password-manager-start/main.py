@@ -3,6 +3,9 @@ import random
 import string
 from tkinter import messagebox
 import json
+
+PASSWORD_FILE = r"c:\Users\Manoj\Downloads\passwords.json"
+
 # ---------------------------- PASSWORD GENERATOR ------------------------------- #
 def generate_password():
     li=[]
@@ -39,18 +42,37 @@ def password_saving():
             messagebox.showinfo(title="Oops", message="Please make sure to enter the credentials")
         else:
             try:
-                with open(r"c:\Users\Manoj\Downloads\passwords.json",'r') as passwords_file:
+                with open(PASSWORD_FILE,'r') as passwords_file:
                     data=json.load(passwords_file)
             except FileNotFoundError:
-                with open(r"c:\Users\Manoj\Downloads\passwords.json",'w') as passwords_file:
+                with open(PASSWORD_FILE,'w') as passwords_file:
                     json.dump(new_data,passwords_file,indent=4)
             else:    
                 data.update(new_data)
-                with open(r"c:\Users\Manoj\Downloads\passwords.json",'w') as passwords_file:
+                with open(PASSWORD_FILE,'w') as passwords_file:
                     json.dump(data,passwords_file,indent=4)
             finally:    
                 delete_all_entries()
-        
+
+# ---------------------------- search credentials ------------------------------- #
+def search_creds():
+    website = website_entry.get()
+    try:
+        with open(PASSWORD_FILE,'r') as password_file:
+            data = json.load(password_file)
+            password = data[website]['password']
+            email = data[website]['email']
+    except KeyError:
+            messagebox.showinfo(title="Error", message=r"No such website")
+            
+    except FileNotFoundError:
+            messagebox.showinfo(title="Error", message=r"No password data file found")
+            
+    else:
+            messagebox.showinfo(title="Credentials", message=f"website : {website}\n email : {email}\n password : {password}")
+    finally:
+         delete_all_entries()
+    
 
 # ---------------------------- UI SETUP ------------------------------- #
 window = Tk()
@@ -83,6 +105,8 @@ password_entry.grid(row=3,column=1,columnspan=1)
 # Buttons
 generate_password_button = Button(text="Generate Password",width=15,command=generate_password)
 generate_password_button.grid(row=3,column=2,columnspan=1)
+search_button = Button(text="Search",width=15,command=search_creds)
+search_button.grid(row=1,column=2,columnspan=1)
 add_button = Button(text="Add",width=30,command=password_saving)
 add_button.grid(row=4,column=1,columnspan=2)
 window.mainloop()
